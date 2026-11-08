@@ -54,6 +54,7 @@ def save(r):
 def make_pipeline(a):
     gw = Gateway(user=a.user, end_user_budget=os.environ.get("FINEPRINT_END_USER_BUDGET"))
     return Pipeline(gw, mcp_url=os.environ.get("FINEPRINT_MCP_URL"), mcp_token=os.environ.get("FINEPRINT_MCP_TOKEN"),
+                    guard_url=os.environ.get("FINEPRINT_GUARD_URL"),
                     country=a.country, utc_offset=a.utc_offset)
 
 

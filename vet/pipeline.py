@@ -110,10 +110,10 @@ FX = {"USD": 1, "USDC": 1, "USDT": 1, "EUR": 1.08, "GBP": 1.27, "AUD": 0.65, "CA
 
 class Pipeline:
     def __init__(self, gateway, *, mcp_url=None, mcp_token=None, country="Australia", utc_offset=10.5,
-                 guard_profile="prompt-injection", now=None, log=print):
+                 guard_profile="prompt-injection", guard_url=None, now=None, log=print):
         self.gw, self.country, self.utc_offset = gateway, country, utc_offset
         self.mcp_url, self.mcp_token, self.guard_profile = mcp_url, mcp_token, guard_profile
-        self.now = now
+        self.guard_url, self.now = guard_url, now
         self.log = log
         self.steps = []
 
@@ -157,7 +157,9 @@ class Pipeline:
         return re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", text))[:60000], "direct"
 
     def extract(self, url, page):
-        guard = [{"profile": self.guard_profile, "mode": "block", "on_unavailable": "monitor"}] if self.guard_profile else None
+        guard = None
+        if self.guard_url:
+            guard = [{"profile": self.guard_profile, "mode": "block", "on_unavailable": "monitor", "url": self.guard_url}]
         reply = self.gw.chat(self.model("reader"), [
             {"role": "system", "content": EXTRACT_SYSTEM},
             {"role": "user", "content": f"Rules page {url}:\n\n{page}"},
