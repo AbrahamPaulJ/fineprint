@@ -2,7 +2,7 @@
 
   python -I vet.py check URL [--user NAME]     vet one contest and write reports/<slug>.md and .json
   python -I vet.py batch LEADS.json --top N    vet the soonest leads from a sweep
-  python -I vet.py eval                        compare verdicts with data/vetted.json, a hand-checked set
+  python -I vet.py eval                        compare verdicts with data/vetted.json (labels from AI agents, see README)
 """
 import argparse
 import json
