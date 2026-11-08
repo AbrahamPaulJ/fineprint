@@ -39,9 +39,11 @@ class Reply:
 
     @property
     def cost(self):
+        """Otari reports the billed cost in the body: usage.cost_usd, sandbox and search charges included."""
+        usage = self.raw.get("usage") or {}
         try:
-            return float(self.headers.get("otari-cost-usd") or 0)
-        except ValueError:
+            return float(usage.get("cost_usd") or self.headers.get("otari-cost-usd") or 0)
+        except (TypeError, ValueError):
             return 0.0
 
 

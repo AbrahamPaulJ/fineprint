@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from vet.gateway import BudgetExceeded, Gateway  # noqa: E402
 from vet.mcp_leads import handle_rpc, lead_history, validate  # noqa: E402
-from vet.pipeline import Pipeline, cash_check, check_quotes, parse_json  # noqa: E402
+from vet.pipeline import Pipeline, _rules_links, cash_check, check_quotes, parse_json  # noqa: E402
 
 PAGE = ("Prizes: first place 1,000 USD and second place 200 USD. Open to anyone aged 18 or over worldwide. "
         "Submit by Nov 11 2026. " * 20)
@@ -64,9 +64,9 @@ class Fake:
             content, calls = FOUND, [{"type": "web_search"}, {"type": "mcp", "tool": "lead_history"}]
         else:
             content, calls = JUDGED, []
-        return (200, {"model": body["model"], "otari_tool_calls": calls,
+        return (200, {"model": body["model"], "otari_tool_calls": calls, "usage": {"cost_usd": "0.001"},
                       "choices": [{"message": {"content": "```json\n" + json.dumps(content) + "\n```"}}]},
-                {"Otari-Model": body["model"], "Otari-Cost-USD": "0.001", "Otari-Fallback": "false"})
+                {"Otari-Model": body["model"], "Otari-Fallback": "false"})
 
 
 class PipelineTest(unittest.TestCase):
@@ -132,6 +132,13 @@ class UnitTest(unittest.TestCase):
             {"amount": 999, "currency": "USD", "kind": "project_token", "conditional": False},
             {"amount": 999, "currency": "USD", "kind": "cash", "conditional": True},
         ], fx), 300)
+
+    def test_cash_check_multiplies_by_winner_count(self):
+        self.assertEqual(cash_check([{"amount": 300, "count": 10, "currency": "USD", "kind": "cash", "conditional": False}], {"USD": 1}), 3000)
+
+    def test_rules_links_stay_on_site(self):
+        raw = '<a href="/page/x-contest-rules">r</a><a href="https://evil.example/rules">e</a><a href="/about">a</a>'
+        self.assertEqual(_rules_links(raw, "https://dev.to/challenges/x"), ["https://dev.to/page/x-contest-rules"])
 
     def test_parse_json_with_prose(self):
         self.assertEqual(parse_json('Here you go:\n{"a": 1}\nThanks'), {"a": 1})
