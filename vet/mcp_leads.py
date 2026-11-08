@@ -132,7 +132,7 @@ def main():
     ap.add_argument("--token", default=os.environ.get("FINEPRINT_MCP_TOKEN"))
     a = ap.parse_args()
     print(f"fineprint-leads MCP on http://localhost:{a.port} (token {'on' if a.token else 'off'})")
-    ThreadingHTTPServer(("0.0.0.0", a.port), make_handler(a.token)).serve_forever()
+    ThreadingHTTPServer(("127.0.0.1", a.port), make_handler(a.token)).serve_forever()
 
 
 if __name__ == "__main__":

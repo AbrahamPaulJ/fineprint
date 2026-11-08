@@ -264,6 +264,8 @@ class Pipeline:
                           guardrail_detail=str(e.detail))
         except BudgetExceeded as e:
             report.update(stopped="budget", reason=f"Budget reached ({e.code}); stopped before spending more.")
+        except (GatewayError, ValueError, KeyError, TypeError) as e:
+            report.update(stopped="error", reason=f"Could not finish: {str(e)[:200]}")
         return self._finish(report)
 
     def _soft(self, stage, fn, *args):
