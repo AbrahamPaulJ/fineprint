@@ -84,7 +84,7 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(r["verdict"], "GO")
         self.assertEqual(r["computed"]["real_cash_usd"], 1200)
         self.assertTrue(r["computed"]["ran_in_sandbox"])
-        self.assertAlmostEqual(r["cost_usd"], 0.004)
+        self.assertAlmostEqual(r["cost_usd"], 0.014)  # four model calls at 0.001, one fetch at 0.01
         chats = self.chats()
         self.assertEqual(chats[0]["guardrails"][0]["url"], "https://guard.example")
         self.assertEqual(chats[2]["mcp_servers"][0]["allowed_tools"], ["lead_history"])
