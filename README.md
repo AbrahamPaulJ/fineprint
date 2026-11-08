@@ -46,7 +46,12 @@ Otari connects from its own network, so the service needs a public https URL:
 `data/vetted.json` holds 16 contests with known answers. Those answers came from AI agents (Claude Code) reading each contest's
 rules page on Nov 8, 2026, not from a person, so treat them as a check rather than ground truth.
 
-Results: to be filled in from a real run.
+Result on Nov 8, 2026: agreed on 15 of 16, for $0.73 in total, about 5 cents a contest. Read that number with these in mind:
+
+- It is not a held-out score. I fixed bugs on these same contests while building, so expect worse on new ones.
+- The miss: Aevum Builder Challenge answered GO where the label says MAYBE. It didn't weigh the whitelist and eligibility checks.
+- Two of the matches had weak reasoning. SLAY HACKS reached NO by guessing "students only" from the organiser's name, because it never
+  read the separate eligibility page. Midnight WaveHack reached NO correctly on its pro-rata grants, but also wrongly called USDT a token.
 
 ## Limits
 
