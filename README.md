@@ -18,8 +18,8 @@ student-only prize. Fineprint reads the fine print so you don't have to.
 | Is the sponsor real? Have we seen it before? | Investigator: MiniMax M3 | Web search, plus MCP over our own lead history |
 | Verdict, with quotes checked against the page | Judge: GLM 5.2 | Open-weight model in its own role |
 
-Each role is a routing policy with a fallback. Each user runs under their own daily budget through a service key, with a
-spending ceiling above the workspace. A budget stop ends a run cleanly and says why.
+A role can be a routing policy with a fallback (`FINEPRINT_MODEL_<ROLE>`). With `--user`, spend is billed to that user through a
+service key, under their own budget and the key's ceiling. A budget stop ends a run cleanly and says why.
 
 Hosted Otari has no guardrail service of its own, so `vet/mcp_leads.py` is ours: a rule-based check for text aimed at AI
 readers, passed by URL on each request, sharing a server with the MCP tool.
