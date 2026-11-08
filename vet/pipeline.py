@@ -136,10 +136,10 @@ FX = {"USD": 1, "USDC": 1, "USDT": 1, "EUR": 1.08, "GBP": 1.27, "AUD": 0.65, "CA
 
 class Pipeline:
     def __init__(self, gateway, *, mcp_server_id=None, mcp_url=None, mcp_token=None, country="Australia", utc_offset=10.5,
-                 guard_profile="prompt-injection", guard_url=None, now=None, log=print):
+                 guard_profile="prompt-injection", guard_url=None, now=None, log=print, follow_links=True):
         self.gw, self.country, self.utc_offset = gateway, country, utc_offset
         self.mcp_server_id, self.mcp_url, self.mcp_token, self.guard_profile = mcp_server_id, mcp_url, mcp_token, guard_profile
-        self.guard_url, self.now = guard_url, now
+        self.guard_url, self.now, self.follow_links = guard_url, now, follow_links
         self.log = log
         self.steps = []
 
@@ -152,18 +152,41 @@ class Pipeline:
         extra = " (fallback)" if reply.fallback else ""
         self.log(f"  {stage:12} {reply.model}{extra}  ${reply.cost:.4f}")
 
-    def read(self, url):
+    def _fetch_text(self, url):
+        """The gateway's fetcher, retried once on a server error since some sites fail it intermittently."""
+        for attempt in (1, 2):
+            try:
+                return (self.gw.fetch(url)[0].get("text") or ""), None
+            except BudgetExceeded:
+                raise
+            except GatewayError as e:
+                if e.status < 500 or attempt == 2:
+                    return "", e.code
+
+    def _linked_rules(self, url):
+        """The fetcher's text drops link targets, so find rules links in the raw page, then read them through the gateway."""
+        if not self.follow_links:
+            return ""
         try:
-            page, _ = self.gw.fetch(url)
-            text = page.get("text") or ""
-            source = "otari_fetch"
-        except BudgetExceeded:
-            raise
-        except GatewayError as e:
-            self.log(f"  read         gateway fetch failed ({e.code}); trying directly")
-            text, source = "", f"fetch_failed:{e.code}"
+            links = _rules_links(self._get(url), url)
+        except OSError:
+            return ""
+        out = ""
+        for link in links:
+            text, _ = self._fetch_text(link)
+            if text:
+                out += f" --- Linked rules page {link}: {text}"
+        return out
+
+    def read(self, url):
+        text, failed = self._fetch_text(url)
+        source = "otari_fetch" if not failed else f"fetch_failed:{failed}"
+        if failed:
+            self.log(f"  read         gateway fetch failed ({failed}); trying directly")
         if len(text) < 800:  # JS-only sites give the gateway an empty shell
             text, source = self._read_direct(url) or (text, source)
+        elif source == "otari_fetch":
+            text = (text + self._linked_rules(url))[:60000]
         self.steps.append({"stage": "read", "model": source, "fallback": False, "cost_usd": 0.0, "tools": []})
         self.log(f"  read         {source}  {len(text):,} chars")
         return text
@@ -178,6 +201,8 @@ class Pipeline:
         """Some platforms render in the browser but publish a JSON API, and many keep eligibility on a linked rules page."""
         m = re.match(r"https://dorahacks\.io/hackathon/([^/]+)", url)
         target = f"https://dorahacks.io/api/v1/hub/hackathons/{m.group(1)}" if m else url
+        wave = re.match(r"https://app.akindo.io/wave-hacks/([^/]+)", url)
+        target = f"https://api.akindo.io/public/wave-hacks/{wave.group(1)}" if wave else target
         try:
             raw = self._get(target)
         except OSError:

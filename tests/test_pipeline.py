@@ -74,7 +74,7 @@ class PipelineTest(unittest.TestCase):
         self.fake = Fake()
         self.addCleanup(self.fake.server.shutdown)
         self.gw = Gateway(key="otk_test", base=self.fake.base, user="alice", end_user_budget="b1")
-        self.p = Pipeline(self.gw, mcp_url="https://mcp.example/x", mcp_token="t", guard_url="https://guard.example", log=lambda *a: None)
+        self.p = Pipeline(self.gw, mcp_url="https://mcp.example/x", mcp_token="t", guard_url="https://guard.example", log=lambda *a: None, follow_links=False)
 
     def chats(self):
         return [b for p, b, _ in self.fake.requests if p.endswith("/chat/completions")]
@@ -92,6 +92,14 @@ class PipelineTest(unittest.TestCase):
         self.assertGreaterEqual(len({c["model"] for c in chats}), 3)  # distinct roles, distinct models
         self.assertTrue(all(c["user"] == "alice" for c in chats))
         self.assertEqual(self.fake.requests[0][2].get("Otari-End-User-Budget"), "b1")
+
+    def test_linked_rules_are_read_through_the_gateway(self):
+        self.p.follow_links = True
+        self.p._get = lambda url: '<a href="/page/contest-rules">Contest Rules</a>'
+        text = self.p.read("https://example.com/rules-home")
+        self.assertIn("Linked rules page https://example.com/page/contest-rules", text)
+        fetched = [b["url"] for p, b, _ in self.fake.requests if p.endswith("/fetch")]
+        self.assertEqual(fetched, ["https://example.com/rules-home", "https://example.com/page/contest-rules"])
 
     def test_invented_quote_is_dropped(self):
         r = self.p.run("https://example.com/rules")
