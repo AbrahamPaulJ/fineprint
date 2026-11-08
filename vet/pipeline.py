@@ -185,14 +185,18 @@ class Pipeline:
 
     def read(self, url):
         self.fetches = 0
-        text, failed = self._fetch_text(url)
-        source = "otari_fetch" if not failed else f"fetch_failed:{failed}"
-        if failed:
-            self.log(f"  read         gateway fetch failed ({failed}); trying directly")
-        if len(text) < 800:  # JS-only sites give the gateway an empty shell
-            text, source = self._read_direct(url) or (text, source)
-        elif source == "otari_fetch":
-            text = (text + self._linked_rules(url))[:60000]
+        try:
+            text, failed = self._fetch_text(url)
+            source = "otari_fetch" if not failed else f"fetch_failed:{failed}"
+            if failed:
+                self.log(f"  read         gateway fetch failed ({failed}); trying directly")
+            if len(text) < 800:  # JS-only sites give the gateway an empty shell
+                text, source = self._read_direct(url) or (text, source)
+            elif source == "otari_fetch":
+                text = (text + self._linked_rules(url))[:60000]
+        except BudgetExceeded:  # fetches already made were still charged, so keep them in the total
+            self.steps.append({"stage": "read", "model": "stopped: budget", "fallback": False, "cost_usd": self.fetches * FETCH_PRICE_USD, "tools": []})
+            raise
         self.steps.append({"stage": "read", "model": source, "fallback": False, "cost_usd": self.fetches * FETCH_PRICE_USD, "tools": []})
         self.log(f"  read         {source}  {len(text):,} chars")
         return text

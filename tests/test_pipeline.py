@@ -125,6 +125,17 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(r["stopped"], "budget")
         self.assertIsNone(r["verdict"])
 
+    def test_budget_stop_while_reading_keeps_fetches_already_charged(self):
+        self.p.follow_links = True
+        self.p._get = lambda url: '<a href="/page/contest-rules">Contest Rules</a>'
+        answer = self.fake.answer
+        over = (403, {"detail": "End user has exceeded budget limit", "code": "budget_exceeded"}, {})
+        self.fake.answer = lambda path, body: over if "contest-rules" in body.get("url", "") else answer(path, body)
+        r = self.p.run("https://example.com/rules-home")
+        self.assertEqual(r["stopped"], "budget")
+        self.assertAlmostEqual(r["cost_usd"], 0.01)  # the first fetch was charged, the refused one was not
+        self.assertEqual(self.chats(), [])
+
     def test_budget_error_shape_with_detail_object(self):
         self.fake.deny = (lambda b: True, 403, {"detail": {"code": "budget_exceeded", "message": "over"}})
         with self.assertRaises(BudgetExceeded):
