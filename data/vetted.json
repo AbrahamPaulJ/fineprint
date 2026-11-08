@@ -1,0 +1,18 @@
+[
+ {"name": "Mozilla Otari Hackathon", "url": "https://dorahacks.io/hackathon/mozilla-devs-wilding/", "expected": "GO", "why": "Plain cash, open, small field"},
+ {"name": "Presage SmartSpectra (dev.to)", "url": "https://dev.to/challenges/presage-2026-11-04", "expected": "GO", "why": "10 x $300, solo, 18+"},
+ {"name": "Zindi Underwater Vessel Noise", "url": "https://zindi.africa/competitions/french-embassy-underwater-vessel-noise-challenge", "expected": "GO", "why": "Cash, open to all, solo OK"},
+ {"name": "Aevum Builder Challenge #1", "url": "https://dorahacks.io/hackathon/qday/", "expected": "MAYBE", "why": "Real USDT; whitelist and eligibility checks"},
+ {"name": "dreamDEX Perps Builder Bounty", "url": "https://dorahacks.io/hackathon/dreamdex-perps-bounty/", "expected": "MAYBE", "why": "Part paid only on mainnet orders; whitelist"},
+ {"name": "Reactive Omni Buildathon", "url": "https://dorahacks.io/hackathon/reactive-omni-buildathon/", "expected": "NO", "why": "Paid in REACT tokens"},
+ {"name": "Cortensor Hackathon #5", "url": "https://dorahacks.io/hackathon/2418/", "expected": "NO", "why": "Paid in $COR, part locked, discretionary"},
+ {"name": "Anna AI App Builder", "url": "https://dorahacks.io/hackathon/2349/", "expected": "NO", "why": "Pays only at 200 monthly active users"},
+ {"name": "MultiHopper Build & Route", "url": "https://superteam.fun/earn/listing/multihopper-build-and-route-challenge-up-to-dollar50000-revenue-share-1/", "expected": "NO", "why": "Pays only if $2M is routed; draft terms"},
+ {"name": "Midnight WaveHack wave 3", "url": "https://app.akindo.io/wave-hacks/jaMZjqPOBsLXvjdG", "expected": "NO", "why": "Pro-rata split, about $38 per entry last wave"},
+ {"name": "CIVIC Hack 2026", "url": "https://civic-hack-2026.devpost.com/rules", "expected": "NO", "why": "College students, Waterloo member required"},
+ {"name": "IceHacks", "url": "https://icehacks.devpost.com/rules", "expected": "NO", "why": "Students only, no cash"},
+ {"name": "SLAY HACKS", "url": "https://slayy-hacks.devpost.com/rules", "expected": "NO", "why": "Students only"},
+ {"name": "Ctrl+V Hackathon", "url": "https://ctrl-v-hackathon-31831.devpost.com/rules", "expected": "NO", "why": "Credits only, students only"},
+ {"name": "HETIC AI Agents for Founders", "url": "https://ai-agents-founders-hetic-26.devpost.com/rules", "expected": "NO", "why": "Enrolment required, teams of 2-4"},
+ {"name": "Zindi GenAI for Good: Cities", "url": "https://zindi.africa/competitions/GenAI-for-Good-Challenge", "expected": "NO", "why": "No cash this phase, teams of 2+"}
+]
