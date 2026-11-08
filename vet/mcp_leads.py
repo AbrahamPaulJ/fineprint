@@ -16,6 +16,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROTOCOL = "2025-06-18"
+MAX_BODY = 4_000_000  # this is on the public internet; the largest real request is one rules page
 TOOL = {
     "name": "lead_history",
     "description": "Look up a contest or sponsor in our record of past sweeps and verdicts. Returns matching rows, newest first.",
@@ -110,7 +111,13 @@ def make_handler(token=None, root=ROOT):
 
         def do_POST(self):
             if self.path.rstrip("/").endswith("/validate"):  # holds nothing private, and Otari sends no token on a request's url
-                return self._send(200, validate(json.loads(self.rfile.read(int(self.headers.get("Content-Length") or 0)))))
+                size = int(self.headers.get("Content-Length") or 0)
+                if size > MAX_BODY:
+                    return self._send(413, {"error": "too large"})
+                try:
+                    return self._send(200, validate(json.loads(self.rfile.read(size))))
+                except (ValueError, AttributeError):
+                    return self._send(400, {"error": "bad request"})
             if token and self.headers.get("Authorization") != f"Bearer {token}":
                 return self._send(401, {"error": "unauthorized"})
             try:

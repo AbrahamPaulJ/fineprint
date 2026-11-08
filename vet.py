@@ -55,7 +55,7 @@ def make_pipeline(a):
     # Only a service key may name an end user; a plain key is refused with 403.
     key = os.environ.get("OTARI_SERVICE_KEY") if a.user else None
     gw = Gateway(key=key, user=a.user, end_user_budget=os.environ.get("FINEPRINT_END_USER_BUDGET"))
-    return Pipeline(gw, mcp_url=os.environ.get("FINEPRINT_MCP_URL"), mcp_token=os.environ.get("FINEPRINT_MCP_TOKEN"),
+    return Pipeline(gw, mcp_server_id=os.environ.get("FINEPRINT_MCP_SERVER_ID"), mcp_url=os.environ.get("FINEPRINT_MCP_URL"), mcp_token=os.environ.get("FINEPRINT_MCP_TOKEN"),
                     guard_url=os.environ.get("FINEPRINT_GUARD_URL"),
                     country=a.country, utc_offset=a.utc_offset)
 

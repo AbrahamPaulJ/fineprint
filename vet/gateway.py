@@ -99,10 +99,10 @@ class Gateway:
             return BudgetExceeded(e.code, code, detail)
         return GatewayError(e.code, code, detail)
 
-    def chat(self, model, messages, *, tools=None, guardrails=None, mcp_servers=None, response_format=None,
+    def chat(self, model, messages, *, tools=None, guardrails=None, mcp_servers=None, mcp_server_ids=None, response_format=None,
              max_tool_iterations=None, temperature=0, max_tokens=None, headers=None):
         body = {"model": model, "messages": messages, "temperature": temperature}
-        for k, v in (("tools", tools), ("guardrails", guardrails), ("mcp_servers", mcp_servers),
+        for k, v in (("tools", tools), ("guardrails", guardrails), ("mcp_servers", mcp_servers), ("mcp_server_ids", mcp_server_ids),
                      ("response_format", response_format), ("max_tool_iterations", max_tool_iterations),
                      ("max_tokens", max_tokens), ("user", self.user)):
             if v:
