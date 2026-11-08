@@ -52,9 +52,9 @@ def lead_history(query, root=ROOT, limit=8):
 # Phrases that talk to an AI reader rather than a human entrant. Rules pages mention "AI" constantly, so these stay specific.
 INJECTION = re.compile(
     r"(ignore|disregard|forget|override)\s+(all\s+|any\s+|the\s+|your\s+)*(previous|prior|above|earlier|system)\s+(instructions?|prompts?|rules)"
-    r"|(if|when)\s+you\s+are\s+an?\s+(ai|llm|language model|agent|assistant)"
-    r"|(ai|llm)\s+(agents?|assistants?|models?|readers?)\s*(reading|must|should|are instructed)"
-    r"|(reveal|print|repeat)\s+your\s+(system\s+)?(prompt|instructions)"
+    r"|(if|when)\s+you\s+are\s+an?\s+(ai|llm|language model|agent|assistant)\b"
+    r"|\b(ai|llm)\s+(agents?|assistants?|models?|readers?)\s*(reading|must|should|are instructed)\b"
+    r"|\b(reveal|print|repeat)\s+your\s+(system\s+)?(prompt|instructions)"
     r"|do\s+not\s+(tell|inform|mention\s+to)\s+the\s+(user|human)"
     r"|</?(system|assistant)>|\[/?INST\]|<\|im_start\|>", re.I)
 
