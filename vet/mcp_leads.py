@@ -38,13 +38,14 @@ def lead_history(query, root=ROOT, limit=8):
         hay = json.dumps({k: r.get(k) for k in ("url", "facts", "reason")}, ensure_ascii=False).lower()
         if any(w in hay for w in words):
             hits.append({"type": "verdict", "url": r.get("url"), "verdict": r.get("verdict"), "reason": r.get("reason")})
-    for path in sorted(glob.glob(os.path.join(root, "leads", "sweep-*.json")), reverse=True)[:3]:
+    # Dated sweeps only: sweep-seen.json sits in the same folder and is not a list of leads.
+    for path in sorted(glob.glob(os.path.join(root, "leads", "sweep-2*.json")), reverse=True)[:3]:
         try:
             rows = json.load(open(path, encoding="utf-8"))
         except (OSError, ValueError):
             continue
-        for r in rows:
-            if all(w in (r.get("title") or "").lower() for w in words[:2]):
+        for r in rows if isinstance(rows, list) else []:
+            if isinstance(r, dict) and all(w in (r.get("title") or "").lower() for w in words[:2]):
                 hits.append({"type": "lead", "seen_in": os.path.basename(path), "title": r.get("title"), "url": r.get("url"),
                              "cash_usd": r.get("cash_usd"), "deadline": r.get("deadline"), "entrants": r.get("entrants")})
     return {"matches": hits[:limit], "total": len(hits)}
